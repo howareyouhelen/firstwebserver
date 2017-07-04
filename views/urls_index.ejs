@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <header>
+    <% include ./partials/_header %>
+  </header>
+  <ul>
+  <% for (var shortkeys in urls) { %>
+<!--   for every shortkey in the urls(obj) pass through shortkeys -->
+    <li><%= urls[shortkeys] %><%= shortkeys %></li>
+
+  <% } %>
+  </ul>
+</body>
+</html>
