@@ -10,7 +10,9 @@
   <ul>
   <% for (var shortkeys in urls) { %>
 <!--   for every shortkey in the urls(obj) pass through shortkeys -->
-    <li><%= urls[shortkeys] %><%= shortkeys %></li>
+    <li><%= urls[shortkeys] %><%= shortkeys %><form method="POST" action="/urls/<%= shortkeys %>/delete">
+      <input type="button" value="Delete">
+    </form></li>
 
   <% } %>
   </ul>
