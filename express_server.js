@@ -1,7 +1,9 @@
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
+const bodyParser = require("body-parser");
 
+app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs")
 
 //below is implementing the func generateRandomString()
@@ -42,21 +44,24 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]
+  res.redirect(longURL);
+});
+
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
 
-
-
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const randomShortURL = generateRandomString();
+  urlDatabase[randomShortURL] = req.body.longURL;
+  console.log(urlDatabase);
+  res.redirect(`http://localhost:1234/urls/${randomShortURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
