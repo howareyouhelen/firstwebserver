@@ -4,9 +4,17 @@ var PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs")
 
-function generateRandomString() {
+//below is implementing the func generateRandomString()
 
+function generateRandomString() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 6; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
 }
+
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
