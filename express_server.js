@@ -60,6 +60,11 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase);
   res.redirect(`http://localhost:1234/urls/${randomShortURL}`);         // Respond with 'Ok' (we will replace this)
 });
+//delete an individual URL
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
