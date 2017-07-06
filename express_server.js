@@ -19,10 +19,25 @@ function generateRandomString() {
   return text;
 }
 
+//URL datastore
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+//user datastore
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -62,6 +77,11 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//registration
+app.get("/register", (req, res) => {
+  res.render("urls_registration")
+})
+
 app.post("/urls", (req, res) => {
   const randomShortURL = generateRandomString();
   urlDatabase[randomShortURL] = req.body.longURL;
@@ -74,7 +94,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// //update URL
+//update URL
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect("/urls");
@@ -91,6 +111,16 @@ app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
 })
+
+//registration
+app.post("/registration", (req, res) => {
+  const randomUserID = generateRandomString();
+  users[randomUserID.emal] = randomUserID;
+  res.cookie("username", randomUserID);
+  console.log(users);
+  res.redirect("/urls")
+})
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
