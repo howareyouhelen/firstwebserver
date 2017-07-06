@@ -2,8 +2,18 @@
   <title>Header Title</title>
 </head>
 <body>
-  <form method="POST" action="/login">>
-    <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
-    <input type="submit" value="username">
+ <% if (!username) { %>
+  <h1><p style="display: inline-block;"><%= username %></p></h1>
+  <form method="POST" action="/login" style="display: inline-block;">
+    <input id="username" type="text" name="username" placeholder="insert a login name" style="width: 300px">
+    <input type="submit" value="login">
   </form>
+ <% } else { %>
+ <p>
+     <%= username %>
+  <form method="POST" action="/logout">
+    <input type="submit" value="logout">
+ </p>
+ </form>
+  <% } %>
 </body>
