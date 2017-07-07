@@ -3,11 +3,29 @@ var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcrypt');
 
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs")
 app.use(cookieParser());
+
+function userFinder (object) {
+  for (var uid in users) {
+    if (users[uid].email === object) {
+      return users[uid];
+    }
+  }
+  return undefined;
+};
+function passwordFinder (object) {
+  for (var uid in users) {
+    if (users[uid].password === object) {
+      return users[uid];
+    }
+  }
+  return undefined;
+};
 
 //below is implementing the func generateRandomString()
 
@@ -15,17 +33,35 @@ function generateRandomString() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 6; i++)
+  for (var i = 0; i < 6; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
   return text;
 }
 // var user_id = req.cookies.user_id
 //URL datastore
 
+function urlsForUser(userID) {
+  var listOfCreatorURL = {};
+  for (var shortURL in urlDatabase) {
+    if (userID === urlDatabase[shortURL].creator) {
+      listOfCreatorURL[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return listOfCreatorURL;
+}
+
+  // make an empty array
+  // loop through the urlDatabase
+  // for each one, if it belongs to the user in question, push it
+  // otherwise ignore it
+  // return the generated array
+
+
 var urlDatabase = {
   "9sm5xK": {
-    "longURL": "wwww.google.com"
-    "creator": "user@example.com"
+    longURL: "http://www.google.com",
+    creator: "user@example.com"
   }
 }
 // var urlDatabase = {
@@ -65,7 +101,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies.user_id),
     user: users[req.cookies["user_id"]]
  };
   res.render("urls_index", templateVars);
@@ -77,14 +113,22 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
-  res.redirect(longURL);
+  for (var key in urlDatabase) {
+    if (key === req.params.shortURL) {
+      const longURL = urlDatabase[req.params.shortURL].longURL;
+      res.redirect(longURL);
+    }
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], user: users[req.cookies["user_id"]]
  };
+ if (urlDatabase[req.params.id].creator === req.cookies["user_id"]) {
   res.render("urls_show", templateVars);
+  } else {
+  res.send("Please login to see your data");
+  }
 });
 
 //registration
@@ -101,12 +145,11 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   const randomShortURL = generateRandomString();
   urlDatabase[randomShortURL] = {
-    "longURL": req.body.longURL
+    "longURL": req.body.longURL,
     "creator": req.cookies["user_id"]
   };
-
   console.log(urlDatabase);
-  res.redirect(`http://localhost:1234/urls/${randomShortURL}`);
+  res.redirect(`/urls/${randomShortURL}`);
 });
 
 //delete an individual URL
@@ -119,7 +162,6 @@ app.post("/urls/:id/delete", (req, res) => {
   } else {
     res.send("You didn't make this url!");
   }
-}
 });
 //start off w/ empty obj, for loop, if match with creator we will add it into the empty obj(aka temp var)
 
@@ -138,16 +180,17 @@ app.post("/urls/:id", (req, res) => {
 //the login
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  const user = Object.values(users).find((usr)=>{return (usr.email === email);})
-  if (!user){
+  const user = userFinder(email);
+  const hashed_password = bcrypt.hashSync(password, 10);
+  const userpass = passwordFinder(password);
+  if (!user) {
     return res.sendStatus(403)
-  }
-    //if doesn't match email --> 403
-  if (user.password !== password) {
-    return res.sendStatus(403)
+  } else {
+    if (!bcrypt.compareSync(password, hashed_password)) {
+      return res.sendStatus(403)
+    }
   }
     //if doesn't match pw of existing email -->403
-
   res.cookie("user_id", user.id);
   res.redirect("/urls");
     //if both pass set user_id cookie w/ matching user's random ID
@@ -163,19 +206,21 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const randomUserID = generateRandomString();
   const {email, password} = req.body;
+  const oripassword = password;
+  const hashed_password = bcrypt.hashSync(oripassword, 10);
 
   console.log(users[randomUserID]);
   if (!email || !password) {
     return res.sendStatus(400)
   }
-  const user = Object.values(users).find((usr)=>{return (usr.email === email);})
-  if (user) {
+  if (!!userFinder(email)) {
     return res.sendStatus(400)
   }
+
   users[randomUserID] = {
     id: randomUserID,
     email: email,
-    password: password
+    password: hashed_password
   };
   res.cookie("user_id", randomUserID);
   return res.redirect("/urls")
