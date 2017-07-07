@@ -1,19 +1,21 @@
 <head>
-  <title>Header Title</title>
+  <title>TinyAPP</title>
 </head>
 <body>
- <% if (!username) { %>
-  <h1><p style="display: inline-block;"><%= username %></p></h1>
-  <form method="POST" action="/login" style="display: inline-block;">
-    <input id="username" type="text" name="username" placeholder="insert a login name" style="width: 300px">
-    <input type="submit" value="login">
-  </form>
- <% } else { %>
- <p>
-     <%= username %>
+  <h1>Tiny App </h1>
+  <% if (user) { %>
+  <p><%= user.id %> </p>
   <form method="POST" action="/logout">
     <input type="submit" value="logout">
- </p>
- </form>
+  </form>
+
+ <% } else { %>
+  <h2>
+  <p style="display: inline-block;"><%= user %></p>
+  </h2>
+
+  <a href="http://localhost:1234/register">Sign up</a><br>
+  <a href="http://localhost:1234/login">Login</a>
+
   <% } %>
 </body>
