@@ -19,12 +19,21 @@ function generateRandomString() {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   return text;
 }
-
+// var user_id = req.cookies.user_id
 //URL datastore
+
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+  "9sm5xK": {
+    "longURL": "wwww.google.com"
+    "creator": "user@example.com"
+  }
+}
+// var urlDatabase = {
+//   "userID":{
+//     "9sm5xK": "http://www.google.com",
+//     "b2xVn2": "http://www.lighthouselabs.ca"
+//   }
+// };
 
 //user datastore
 const users = {
@@ -55,10 +64,6 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  console.log("welcome to /urls, have a nice day");
-  console.log(users);
-  console.log(req.cookies["user_id"]);
-  console.log(users[req.cookies["user_id"]]);
   let templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
@@ -92,23 +97,42 @@ app.get("/login", (req, res) => {
   res.render("urls_login");
 });
 
+//new URL
 app.post("/urls", (req, res) => {
   const randomShortURL = generateRandomString();
-  urlDatabase[randomShortURL] = req.body.longURL;
+  urlDatabase[randomShortURL] = {
+    "longURL": req.body.longURL
+    "creator": req.cookies["user_id"]
+  };
+
   console.log(urlDatabase);
   res.redirect(`http://localhost:1234/urls/${randomShortURL}`);
 });
 
 //delete an individual URL
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
+  if (urlDatabase[req.params.id] === undefined) {
+    res.send("Record does not exist");
+  } else if (urlDatabase[req.params.id].creator === req.cookies["user_id"]) {
+    delete urlDatabase[req.params.id];
+    res.redirect("/urls");
+  } else {
+    res.send("You didn't make this url!");
+  }
+}
 });
+//start off w/ empty obj, for loop, if match with creator we will add it into the empty obj(aka temp var)
 
 //update URL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect("/urls");
+  if (urlDatabase[req.params.id] === undefined) {
+    res.send("Record does not exist");
+  } else if (urlDatabase[req.params.id].creator === req.cookies["user_id"]) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect("/urls");
+  } else {
+    res.send("You didn't make this url!");
+  }
 });
 
 //the login
