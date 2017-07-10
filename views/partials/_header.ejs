@@ -16,7 +16,7 @@
   <form method="POST" action="/logout">
     <input type="submit" value="logout"><br>
   </form>
-  <form action="http://localhost:1234/urls/new">
+  <form action="/urls/new">
     <input type="submit" value="make a new URL" />
   </form>
 
@@ -26,8 +26,8 @@
   <p style="display: inline-block;"><%= user %></p>
   </h2>
 
-  <a href="http://localhost:1234/register">Sign up</a>
-  <a href="http://localhost:1234/login">Login</a>
+  <a href="/register">Sign up</a>
+  <a href="/login">Login</a>
 
   <% } %>
 </body>
