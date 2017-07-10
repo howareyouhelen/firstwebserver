@@ -3,19 +3,30 @@
   <link rel="shortcut icon" href="/favicon.ico" type="image/png">
 </head>
 <body>
-  <h1><font colour="white">Tiny App </h1>
+  <h1>Tiny App</h1>
+  <style>
+    body {
+      color: #fdfdfd;
+    }
+  </style>
+  </h1>
+
   <% if (user) { %>
-  <p><%= user.id %> </p>
+  <p><%= user.email %> </p>
   <form method="POST" action="/logout">
-    <input type="submit" value="logout">
+    <input type="submit" value="logout"><br>
   </form>
+  <form action="http://localhost:1234/urls/new">
+    <input type="submit" value="make a new URL" />
+  </form>
+
 
  <% } else { %>
   <h2>
   <p style="display: inline-block;"><%= user %></p>
   </h2>
 
-  <a href="http://localhost:1234/register">Sign up</a><br>
+  <a href="http://localhost:1234/register">Sign up</a>
   <a href="http://localhost:1234/login">Login</a>
 
   <% } %>
