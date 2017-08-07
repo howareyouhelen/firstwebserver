@@ -1,26 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>TinyApp</title>
-</head>
-<body>
-  <style>
-    body {
-      background-color: #46dac7;
-    }
-  </style>
-  <header>
-    <% include ./partials/_header %>
-  </header>
-  <ul>
-  <% for (var shortkeys in urls) { %>
-<!--   for every shortkey in the urls(obj) pass through shortkeys -->
-    <li><%= urls[shortkeys].longURL %> (<%= shortkeys %>) <form method="POST" action="/urls/<%= shortkeys %>/delete">
-      <a href="/urls/<%=shortkeys%>">Edit</a>
-      <input type="submit" value="Delete">
-    </form></li>
 
-  <% } %>
-  </ul>
+<head>
+    <title>TinyApp</title>
+</head>
+
+<body>
+    <style>
+        body {
+            background-color: #46dac7;
+        }
+    </style>
+    <header>
+        <% include ./partials/_header %>
+    </header>
+    <ul>
+        <% for (var id in urls) { %>
+            <!--   for every shortid in the urls(obj) pass through shortid -->
+            <li>
+                <%= urls[id] %>
+                    <li>
+                        <a href=/u/<%=id%>><%= id%></a>
+                    </li><br>
+                    <a href="/urls/<%=id%>">Edit</a>
+                    <form method="POST" action="/urls/<%= id%>/delete">
+                        <input type="submit" value="Delete">
+                    </form>
+            </li>
+    </ul>
+    <% } %>
 </body>
+
 </html>
