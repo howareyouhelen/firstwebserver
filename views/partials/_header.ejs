@@ -1,33 +1,27 @@
 <head>
-  <title>TinyAPP</title>
-  <link rel="shortcut icon" href="/favicon.ico" type="image/png">
+    <title>TinyAPP</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/png">
 </head>
+
 <body>
-  <h1>Tiny App</h1>
-  <style>
-    body {
-      color: #fdfdfd;
-    }
-  </style>
-  </h1>
+    <h1>Tiny App</h1>
+    <style>
+        body {
+            background-color: #46dac7;
+            color: #fdfdfd;
+        }
+    </style>
+    </h1>
+    <% if (user) { %>
 
-  <% if (user) { %>
-  <p><%= user.email %> </p>
-  <form method="POST" action="/logout">
-    <input type="submit" value="logout"><br>
-  </form>
-  <form action="/urls/new">
-    <input type="submit" value="make a new URL" />
-  </form>
-
-
- <% } else { %>
-  <h2>
-  <p style="display: inline-block;"><%= user %></p>
-  </h2>
-
-  <a href="/register">Sign up</a>
-  <a href="/login">Login</a>
-
-  <% } %>
+        <h2>Welcome,
+            <%= user.email %>
+        </h2>
+        <form method="POST" action="/logout">
+            <input type="submit" value="logout"><br>
+        </form>
+        <% } else { %>
+            <a href="/register">Sign up</a>
+            <a href="/login">Login</a>
+            <% } %>
 </body>

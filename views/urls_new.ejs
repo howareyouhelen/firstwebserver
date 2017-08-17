@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head></head>
-  <body style="font-size:20px; padding:50px;">
-    <% include partials/_header %>
+
+<head></head>
+
+<body style="font-size:20px; padding:50px;">
+    <header>
+        <% include ./partials/_header %>
+    </header>
+    <h1>URL Shortener</h1>
     <form action="/urls" method="POST" style="margin:150px;">
-      <% if (user) { %>
-      <label for="longURL">Enter a URL:</label>
-      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-      <input type="submit" value="Submit">
-      <% } else { %>
-      <meta HTTP-EQUIV="REFRESH" content="0; url=/urls">
-      <% } %>
+            <label for="longURL">Enter a URL:</label>
+            <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+            <input type="submit" value="Submit">
     </form>
-  </body>
+</body>
+
 </html>
