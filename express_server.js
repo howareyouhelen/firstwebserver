@@ -82,8 +82,7 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
     const userLogged = req.session.user;
     if (!userLogged) {
-        // res.render("urls_not_found");
-        res.sendStatus(400);
+        res.render("urls_not_found");
     } else {
     const templateVars = {
         urls: urlDatabase[userLogged.id],
@@ -100,7 +99,6 @@ app.get("/urls/new", (req, res) => {
         res.redirect('/login');
     }
     const templateVars = {
-        // urls: urlDatabase[userLogged.id],
         user: userLogged
     };
     res.render("urls_new", templateVars);
@@ -110,35 +108,29 @@ app.get("/urls/new", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
     const userLogged = req.session.user;
     let short = req.params.shortURL;
-
     let longURL = urlDatabase[userLogged.id][short];
 
     if (longURL) {
         res.redirect(longURL);
     } else {
-        res.status(404).send('Sorry, we cannot find that!');
+        res.render("urls_doesnot_exist");
     }
 });
 
 //get shorturl's summary
 app.get("/urls/:id", (req, res) => {
-
     const userLogged = req.session.user;
-    // if (!userLogged) {
-    //     res.sendStatus(403);
-    // }
-    // if (!urlDatabase[userLogged][req.params.id]) {
-    //     res.sendStatus(404);
-    // }
-    // if (!creator(urlDatabase, userLogged, req.params.id)) {
-    //     res.sendStatus(403);
-    // }
+    if (!userLogged) {
+        res.render("urls_not_found");
+    }
+    if (!creator(urlDatabase, userLogged, req.params.id)) {
+        res.render("urls_not_creator");
+    }
     let templateVars = {
         shortURL: req.params.id,
         longURL: urlDatabase[userLogged.id][req.params.id],
         user: users[userLogged.id]
     };
-    console.log(templateVars);
     res.render("urls_show", templateVars);
 });
 
@@ -146,7 +138,6 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
     const userLogged = req.session.user;
     const userID = userLogged.id;
-    console.log("user info:", userLogged.id);
     if (userLogged) {
         if(!urlDatabase[userID]) {
             urlDatabase[userID] = {};
@@ -156,7 +147,7 @@ app.post("/urls", (req, res) => {
         urlDatabase[userID][randomShortURL] = longURL;
         res.redirect(`/urls/${randomShortURL}`);
     } else {
-        res.status(400).send("You cant post if you arent logged in");
+        res.render("urls_not_found");
     }
 });
 
@@ -164,15 +155,13 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
     const userLogged = req.session.user;
     if (!req.body.longURL) {
-        res.sendStatus(404);
+        res.render("urls_doesnot_exist");
     }
     if (!userLogged) {
-        res.sendStatus(403);
-        return;
+        res.render("urls_not_found");
     }
     if (!creator(urlDatabase, userLogged, req.params.id)) {
-        res.sendStatus(403);
-        return;
+        res.render("urls_not_creator");
     }
     urlDatabase[userLogged.id][req.params.id] = req.body.longURL;
     res.redirect(`/urls`);
@@ -182,8 +171,10 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
     const userLogged = req.session.user;
     if (!userLogged) {
-        res.sendStatus(401);
-        return;
+        res.render("urls_not_found");
+    }
+    if (!creator(urlDatabase, userLogged, req.params.id)) {
+        res.render("urls_not_creator");
     }
     delete(urlDatabase[userLogged.id][req.params.id]);
     res.redirect('/urls');
@@ -217,11 +208,11 @@ app.post("/login", (req, res) => {
             if (bcrypt.compareSync(password, users[id].password)) {
                 req.session.user = users[id];
                 res.redirect('/urls');
-                return;
+            } else {
+                res.render("urls_not_correct_info");
             }
-        }
+        } 
     }
-    res.sendStatus(401);
 });
 
 //post logout, clear session cookie
